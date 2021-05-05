@@ -77,8 +77,7 @@ public class OGDLConfStateReconfiguringSlotListener extends AbstractConfStateRec
 	}
 
 	@Override
-	protected ConfState parseConfState(SlotEvent event, Fragment fragment, Credentials credentials,
-			ConfStateBinding state, Function<String, Object> requestParameters)
+	protected ConfState parseConfState(SlotEvent event, Fragment fragment, ConfStateBinding state)
 			throws IOException, BadOGDLInSlotException, BadOGDLRootObjectException {
 		Slot slot = event.getSlot();
 		Injection injection = new Injection(new ClassRegistry());
@@ -89,7 +88,7 @@ public class OGDLConfStateReconfiguringSlotListener extends AbstractConfStateRec
 		for(TokenSinkWrapper wrapper : sinkWrappers)
 			injection.addTokenSinkWrapper(wrapper);
 		Object root;
-		try(InputStream is = fragment.retrieve(credentials, state, requestParameters)) {
+		try(InputStream is = fragment.retrieve(event.getCredentials(), state, event::getRequestParameter)) {
 			root = injection.readDescription(is, charset, slot.getKey()).getRootObject();
 		}
 		catch(ObjectDescriptionException ode) {
